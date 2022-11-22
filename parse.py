@@ -14,6 +14,9 @@ for switch in yml_data:
         print('  ip address', yml_data[switch]['interfaces'][interface]['ipv4'],'/',yml_data[switch]['interfaces'][interface]['mask'])
     print('exit')
     print('router bgp', yml_data[switch]['BGP']['ASN'])
-    
+
     for neighbor in yml_data[switch]['BGP']['neighbors']:
         print('  neighbor', yml_data[switch]['BGP']['neighbors'][neighbor]["ipv4"], "remote-as", yml_data[switch]['BGP']['neighbors'][neighbor]["ASN"])
+
+
+        
