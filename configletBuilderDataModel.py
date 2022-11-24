@@ -46,4 +46,5 @@ leaf1-dc2:
 """
 
 yaml_data = yaml.safe_load(dataModel)
+
 print(yaml_data)
