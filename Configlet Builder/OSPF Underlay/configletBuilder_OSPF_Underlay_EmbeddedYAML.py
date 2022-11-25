@@ -14,6 +14,9 @@ for item in tags:
   if key == "hostname":
     hostname = item.split(":")[1]
 
+#AUTRE MANIÈRE D'AVOIR LE HOSTNAME
+hostname = CVPGlobalVariables.getValue(GlobalVariableNames.CVP_SERIAL)
+
 #print(hostname)
 
 import yaml #installÃ© dans CloudVision

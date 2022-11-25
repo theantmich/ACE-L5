@@ -20,6 +20,9 @@ for item in tags:
   if key == "hostname":
     hostname = item.split(":")[1]
 
+#AUTRE MANIÈRE D'AVOIR LE HOSTNAME
+hostname = CVPGlobalVariables.getValue(GlobalVariableNames.CVP_SERIAL)
+
 #Création du socket HTTPS
 ssl._create_default_https_context = ssl._create_unverified_context
 
