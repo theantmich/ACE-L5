@@ -1,0 +1,16 @@
+---
+  - hosts: leaf1-DC1 # could be "all" if we were to push it to all hosts in hosts.ini file.
+    gather_facts: no # in some instances is can be useful to gather facts about the device for the script to work but not for these. it takes time to run
+    tasks:
+    - name: Add User
+      eos_user:
+        name: automator 
+        nopassword: yes
+        privilege: 15
+        role: network-admin
+        state: present
+    - name: Add SSH key
+      eos_user:
+        name: automator
+        sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        state: present

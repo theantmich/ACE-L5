@@ -1,0 +1,17 @@
+---
+  - hosts: leafs_DC1
+    gather_facts: no
+    tasks:
+    - name: Add vlan
+      eos_vlans:
+        config:
+        - vlan_id: "{{ item }}"
+          name: VL{{ item }}
+          state: active
+        state: deleted
+
+      loop:
+        - 3000
+        - 3001
+        - 3010
+        - 3011

@@ -1,0 +1,17 @@
+---
+  - hosts: leafs-DC1 # can be changed to any "container" in brackets in hosts.ini (leafs_DC1, spines_DC1, DC1:children, leafs_DC2, spines_DC2, DC2:children)
+    gather_facts: no
+    tasks:
+    - name: Add vlan
+      eos_vlans:
+        config:
+        - vlan_id: "{{ item }}"
+          name: VL{{ item }}
+          state: active
+        state: merged
+
+      loop:
+        - 3000
+        - 3001
+        - 3010
+        - 3011
