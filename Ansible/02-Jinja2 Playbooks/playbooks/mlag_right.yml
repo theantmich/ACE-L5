@@ -1,0 +1,12 @@
+---
+- hosts: leaf2-DC1, leaf4-DC1, borderleaf2-DC1
+  gather_facts: no
+  tasks:
+  - name: Create template MLAG Right
+    template:
+      src: "{{lookup('env','PWD')}}/templates/mlagRight.j2"
+      dest: "{{lookup('env','PWD')}}/configs/mlagRight.cfg"
+      
+  - name: Upload config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/mlagRight.cfg"

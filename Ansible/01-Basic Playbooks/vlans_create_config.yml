@@ -1,0 +1,10 @@
+---
+  - hosts: leaf1-DC1
+    gather_facts: no
+
+    tasks:
+      - name: Create VLANs
+        eos_config:
+          lines: 
+          - vlan 3000
+          - name vlan3000

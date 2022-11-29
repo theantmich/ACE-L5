@@ -1,0 +1,13 @@
+---
+  - hosts: leaf1-DC1
+    gather_facts: no
+    tasks:
+    - name: Create template
+      template:
+      # Change Jinja Template used to generate the configs.
+        src: "{{lookup('env','PWD')}}/templates/vlans.j2" 
+      # Change configuration file destination. Ajouter {{inventory_hostname}} au nom du fichier final pour avoir un fichier custom pour chaque switch.
+        dest: "{{lookup('env','PWD')}}/configs/vlans.cfg" 
+    - name: Upload config
+      eos_config:
+        src: "{{lookup('env','PWD')}}/configs/vlans.cfg" # Change configuration file to be pushed to switch. Ajouter {{inventory_hostname}} si requis.
