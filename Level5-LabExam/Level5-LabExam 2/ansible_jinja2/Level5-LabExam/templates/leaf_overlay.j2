@@ -1,0 +1,42 @@
+interface vxlan1
+  vxlan source-interface Loopback1
+  vxlan udp-port 4789
+{% for tenant in overlay['TENANTS'] %}
+  vxlan vrf {{ tenant['name'] }} vni {{ tenant['L3VNI'] }}
+{% for vlan in tenant['VLANS']%}
+  vxlan vlan {{ vlan['ID'] }} vni {{ vlan['L2VNI'] }}
+{% endfor %}
+{% endfor %}
+
+router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
+
+{% for tenant in overlay['TENANTS'] %}
+  vrf {{ tenant['name'] }}
+    rd {{ underlay[inventory_hostname]['interfaces']['loopback1']['ipv4']}}:{{ tenant['L3VNI'] }}
+    route-target import evpn {{ tenant['L3VNI'] }}:{{ tenant['L3VNI'] }}
+    route-target export evpn {{ tenant['L3VNI'] }}:{{ tenant['L3VNI'] }}
+    
+{% for vlan in tenant['VLANS']%}
+  vlan {{ vlan['ID'] }}
+    rd auto
+    route-target both {{ vlan['L2VNI'] }}:{{ vlan['L2VNI'] }}
+    redistribute learned
+{% endfor %}
+{% endfor %}
+!
+{% for tenant in overlay['TENANTS'] %}
+vrf instance {{tenant['name']}}
+!
+{% endfor %}
+
+{% for tenant in overlay['TENANTS'] %}
+{% for vlan in tenant['VLANS']%}
+vlan {{ vlan['ID'] }}
+interface vlan {{ vlan['ID'] }}
+  ip address virtual {{ vlan['IRB']}}
+!    
+{% endfor %}
+{% endfor %}
+
+
+

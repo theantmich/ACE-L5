@@ -1,0 +1,24 @@
+
+TENANTS:
+  - name: Red
+    L3VNI: 10000
+    VLANS:
+      - DMZ:
+        ID: 101
+        L2VNI: 10001
+        IRB: 10.10.10.1/24
+      - Internal:
+        ID: 102
+        L2VNI: 10002
+        IRB: 10.10.20.1/24
+  - name: Blue
+    L3VNI: 20000
+    VLANS:
+      - DMZ:
+        ID: 201
+        L2VNI: 20001
+        IRB: 10.20.10.1/24
+      - INTERNAL:
+        ID: 202
+        L2VNI: 20002
+        IRB: 10.20.20.1/24

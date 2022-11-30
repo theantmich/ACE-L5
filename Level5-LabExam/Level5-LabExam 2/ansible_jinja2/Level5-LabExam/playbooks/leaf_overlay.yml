@@ -1,0 +1,22 @@
+# This playbook is to be used to generate leaf overlay config with variables from overlay.yml
+---
+- hosts: leaf[1:4]-DC2
+  gather_facts: no
+  tasks:
+  - name: Register overlay variables 
+    include_vars:
+      file: "{{lookup('env','PWD')}}/vars/overlay.yml"
+      name: overlay
+  - name: Register underlay variables 
+    include_vars:
+      file: "{{lookup('env','PWD')}}/vars/underlay.yml"
+      name: underlay
+  - name: Create template
+    template:
+      src: "{{lookup('env','PWD')}}/templates/leaf_overlay.j2"
+      dest: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_leaf_overlay.cfg"
+# Use the eos_config module to create a task to upload the configuration you created to the switch
+  - name: Upload configuration to devices
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_leaf_overlay.cfg"
+      save_when: always

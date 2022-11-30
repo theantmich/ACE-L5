@@ -4,6 +4,20 @@ from cvplibrary import CVPGlobalVariables, GlobalVariableNames
 hostname = CVPGlobalVariables.getValue(GlobalVariableNames.CVP_SERIAL)
 
 yaml_data = """
+global:
+    DC1: 
+        spine-as: "65100"
+        spine-peers: 
+            - 192.168.101.101
+            - 192.168.101.102
+            - 192.168.101.103
+    DC2: 
+        spine-as: "65200"
+        spine-peers: 
+            - 192.168.201.101
+            - 192.168.201.102
+            - 192.168.201.103
+
 spine1-DC1:
     interfaces:
         Loopback0:
@@ -522,14 +536,27 @@ def configure_bgp():
       print("  no bgp default ipv4-unicast")
       print("  maximum-paths 3")
       print("  distance bgp 20 200 200")
-      print("  bgp listen range 192.168.0.0/16 peer-group LEAF_Underlay peer-filter LEAF-AS-RANGE")
+      print("  bgp listen range 192.168.101.0/24 peer-group EVPN peer-filter LEAF-AS-RANGE")
+      print("  bgp listen range 192.168.103.0/24 peer-group LEAF_Underlay peer-filter LEAF-AS-RANGE")
+      print("  bgp listen range 192.168.201.0/24 peer-group EVPN peer-filter LEAF-AS-RANGE")
+      print("  bgp listen range 192.168.203.0/24 peer-group LEAF_Underlay peer-filter LEAF-AS-RANGE")
+
+      
       print("  neighbor LEAF_Underlay peer group")
       print("  neighbor LEAF_Underlay send-community")
       print("  neighbor LEAF_Underlay maximum-routes 12000")
+      print("  neighbor EVPN peer group")
+      print("  neighbor EVPN ebgp-multihop")
+      print("  neighbor EVPN send-community")
+      print("  neighbor EVPN maximum-routes 0")
+
       print("  redistribute connected route-map LOOPBACK")
+      
       print("  address-family ipv4")
       print("    neighbor LEAF_Underlay activate")
-      print("    redistribute connected route-map LOOPBACK")
+
+      print("  address-family evpn")
+      print("  neighbor EVPN activate")
       
   if "leaf" in hostname:
     ASN = config[hostname]["BGP"]["ASN"]
@@ -575,6 +602,26 @@ def configure_bgp():
     print("  address-family ipv4")
     print("    neighbor SPINE_Underlay activate")
     print("    neighbor LEAF_Peer activate")
+
+    print("  neighbor EVPN peer group")
+    print("  neighbor EVPN remote-as %s") % spineASN
+    print("  neighbor EVPN update-source Loopback0")
+    print("  neighbor EVPN ebgp-multihop")
+    print("  neighbor EVPN send-community")
+    print("  neighbor EVPN maximum-routes 0")
+
+    if "DC1" in hostname:
+        for peer in config["global"]["DC1"]["spine-peers"]:
+            peer_ip = peer
+            print("  neighbor %s peer group EVPN") % peer_ip
+    elif "DC2" in hostname:
+        for peer in config["global"]["DC2"]["spine-peers"]:
+            peer_ip = peer
+            print("  neighbor %s peer group EVPN") % peer_ip
+
+    print("  address-family evpn")
+    print("  neighbor EVPN activate")
+
 
 configure_interfaces()
 configure_bgp()
