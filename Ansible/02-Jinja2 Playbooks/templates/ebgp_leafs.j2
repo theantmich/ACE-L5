@@ -1,0 +1,88 @@
+{% for item in underlay[inventory_hostname]['interfaces'] %}
+
+interface {{ item }}
+  ip address {{ underlay[inventory_hostname]['interfaces'][item]['ipv4']}}/{{ underlay[inventory_hostname]['interfaces'][item]['mask']}}
+{% if "Ethernet" in item %}
+  no switchport
+  mtu {{ underlay['global']['MTU'] }}
+{% endif %}
+{% endfor %}
+
+{# This creates the VLAN database entries #}
+spanning-tree mode mstp
+no spanning-tree vlan-id 4094
+vlan 4094
+   name MLAG_4094_Jinja!
+   trunk group MLAGPEER
+
+{# This creates the SVIs #}
+interface Vlan4094
+  description MLAG PEER LINK
+{% if 'Even' in underlay[inventory_hostname]['MLAG'] %}
+  ip address 192.168.255.2/30
+{% elif 'Odd' in underlay[inventory_hostname]['MLAG'] %}
+  ip address 192.168.255.1/30
+{% endif %}
+
+interface Port-Channel10
+  description MLAG PEER LINK - LEAF
+  switchport mode trunk
+  switchport trunk group MLAGPEER
+
+mlag configuration
+  domain-id MLAG
+  local-interface Vlan4094
+{% if 'Even' in underlay[inventory_hostname]['MLAG'] %}
+  peer-address 192.168.255.1
+{% elif 'Odd' in underlay[inventory_hostname]['MLAG'] %}
+  peer-address 192.168.255.2
+{% endif %}
+  peer-link Port-Channel10
+
+interface Ethernet1
+  description MLAG PEER LINK - LEAF
+  switchport mode trunk
+  channel-group 10 mode active
+
+interface Ethernet2
+  description MLAG PEER LINK -- LEAF
+  switchport mode trunk
+  channel-group 10 mode active
+
+ip prefix-list LOOPBACK
+  seq 10 permit 192.168.101.0/24 ge 24
+  seq 20 permit 192.168.102.0/24 ge 24
+  seq 30 permit 192.168.201.0/24 ge 24
+  seq 40 permit 192.168.202.0/24 ge 24
+route-map LOOPBACK permit 10
+  match ip address prefix-list LOOPBACK
+router bgp {{ underlay['global']['BGP']['ASN'][inventory_hostname] }}
+  router-id {{ underlay[inventory_hostname]['interfaces']['Loopback0']['ipv4'] }}
+  no bgp default ipv4-unicast
+  maximum-paths 3
+  distance bgp 20 200 200
+  neighbor SPINE_Underlay peer group
+{% if 'DC1' in underlay[inventory_hostname]['DC'] %}
+  neighbor SPINE_Underlay remote-as {{ underlay['global']['BGP']['ASN']['spine1-DC1'] }}
+{% elif 'DC2' in underlay[inventory_hostname]['DC'] %}
+  neighbor SPINE_Underlay remote-as {{ underlay['global']['BGP']['ASN']['spine1-DC2'] }}
+{% endif %}
+  neighbor SPINE_Underlay send-community
+  neighbor SPINE_Underlay maximum-routes 12000
+  neighbor LEAF_Peer peer group
+  neighbor LEAF_Peer remote-as {{ underlay['global']['BGP']['ASN'][inventory_hostname] }}
+  neighbor LEAF_Peer next-hop-self
+  neighbor LEAF_Peer maximum-routes 12000
+{% for peer in underlay[inventory_hostname]['spine-peers'] %}
+  neighbor {{ peer }} peer group SPINE_Underlay
+{% endfor %}
+{% if 'Even' in underlay[inventory_hostname]['MLAG'] %}
+  neighbor 192.168.255.1 peer group LEAF_Peer
+{% elif 'Odd' in underlay[inventory_hostname]['MLAG'] %}
+  neighbor 192.168.255.2 peer group LEAF_Peer
+{% endif %}
+  redistribute connected route-map LOOPBACK
+  address-family ipv4
+    neighbor SPINE_Underlay activate
+    neighbor LEAF_Peer activate
+    redistribute connected route-map LOOPBACK

@@ -1,0 +1,22 @@
+---
+- hosts: spines_DC2
+  gather_facts: no
+  tasks:
+  - name: Register variables
+    include_vars:
+      file: "{{lookup('env','PWD')}}/vars/underlay-EBGP.yml"
+      name: underlay
+
+  - name: Configure interfaces
+    template:
+      src: "{{lookup('env','PWD')}}/templates/ebgp_spines.j2"
+      dest: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
+
+  - name: Upload config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
+
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start

@@ -1,0 +1,22 @@
+---
+- hosts: borderleaf1_DC1,borderleaf2_DC1
+  gather_facts: no
+  tasks:
+  - name: Register variables
+    include_vars:
+      file: "{{lookup('env','PWD')}}/vars/underlay-EBGP.yml"
+      name: underlay
+
+  - name: Configure interfaces
+    template:
+      src: "{{lookup('env','PWD')}}/templates/ebgp_leafs.j2"
+      dest: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
+
+  - name: Upload config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
+
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start
