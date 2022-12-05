@@ -1,0 +1,24 @@
+---
+- hosts: DC1, DC2
+  gather_facts: no
+  tasks:
+   - name: Upload EBGP config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
+
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start
+
+- hosts: spines-DC1
+  gather_facts: no
+  tasks:
+   - name: Upload spines-DC1 interface configuration
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_interfaces.cfg"
+
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start
