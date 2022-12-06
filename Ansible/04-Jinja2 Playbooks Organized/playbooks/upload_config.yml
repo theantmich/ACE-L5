@@ -1,0 +1,12 @@
+---
+- hosts: DC1, DC2
+  gather_facts: no
+  tasks:
+  - name: Upload configuration through ansible
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_underlay.cfg"
+
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start
