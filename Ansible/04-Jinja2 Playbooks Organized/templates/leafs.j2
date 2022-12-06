@@ -85,9 +85,16 @@ router bgp {{ config['global']['BGP']['ASN'][inventory_hostname] }}
 {% elif 'Odd' in config[inventory_hostname]['MLAG'] %}
   neighbor 192.168.255.2 peer group LEAF_Peer
 {% endif %}
-
+{% if 'borderleaf' in inventory_hostname %}
+  neighbor DCI_config peer group
+  neighbor DCI_config remote-as {{ config['global']['BGP']['ASN']['DCI'] }}
+  neighbor DCI_config send-community
+  neighbor DCI_config maximum-routes 12000
+  neighbor {{ config[inventory_hostname]['dci_peer'] }} peer group DCI_config
+{% endif %}
   redistribute connected route-map LOOPBACK
   address-family ipv4
     neighbor SPINE_config activate
     neighbor LEAF_Peer activate
+    neighbor DCI_config activate
     redistribute connected route-map LOOPBACK
