@@ -505,6 +505,7 @@ def configure_bgp():
   print(" seq 20 permit 192.168.102.0/24 ge 24")
   print(" seq 30 permit 192.168.201.0/24 ge 24")
   print(" seq 40 permit 192.168.202.0/24 ge 24")
+  print(" seq 50 permit 192.168.253.0/24 ge 24")
   print("route-map LOOPBACK permit 10")
   print(" match ip address prefix-list LOOPBACK")
   
