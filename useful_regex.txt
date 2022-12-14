@@ -1,0 +1,23 @@
+#Remove double enters
+
+\r\n\r\n        ->      \r\n
+
+#Lowercase device names:
+
+\r\nS(pine\d)           ->      \r\ns$1-DC1:
+\r\nL(eaf\d)            ->      \r\nl$1-DC1:
+\r\nB(orderleaf\d)      ->      \r\nb$1-DC1:
+
+#Add -DC1 and -DC2
+
+(spine\d|leaf\d|borderleaf\d)       ->      $1-DC1:
+(spine\d|leaf\d|borderleaf\d)       ->      $1-DC2:
+
+#Add "interfaces" key:
+
+
+
+#Format interfaces:
+
+(Loopback\d: )(.*)		->		$1\r\n *add right amount of spaces* ipv4: $2\r\n *add same amount of spaces* mask: 32
+(Ethernet\d\d?: )(.*)	->		$1\r\n *add right amount of spaces* ipv4: $2\r\n *add same amount of spaces* mask: 31

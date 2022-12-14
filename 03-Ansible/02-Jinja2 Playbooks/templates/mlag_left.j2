@@ -1,12 +1,13 @@
 {# This creates the VLAN database entries #}
 spanning-tree mode mstp
-no spanning-tree vlan-id 4093
 vlan 4093
    name MLAG_4093_Jinja
    trunk group MLAGPEER
 
+no spanning-tree vlan-id 4093
+
 {# This creates the SVIs #}
-interface Vlan4094
+interface Vlan4093
   description MLAG PEER LINK
   ip address 192.168.255.1/30
 
@@ -17,7 +18,7 @@ interface Port-Channel10
 
 mlag configuration
   domain-id MLAG
-  local-interface Vlan4094
+  local-interface Vlan4093
   peer-address 192.168.255.2
   peer-link Port-Channel10
 

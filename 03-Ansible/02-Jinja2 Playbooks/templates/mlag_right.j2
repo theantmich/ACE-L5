@@ -1,9 +1,11 @@
 {# This creates the VLAN database entries #}
 spanning-tree mode mstp
-no spanning-tree vlan-id 4093
+
 vlan 4093
    name MLAG_4093_Jinja
    trunk group MLAGPEER
+
+no spanning-tree vlan-id 4093
 
 {# This creates the SVIs #}
 interface Vlan4093
