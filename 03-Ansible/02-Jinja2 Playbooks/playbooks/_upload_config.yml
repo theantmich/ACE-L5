@@ -2,7 +2,7 @@
 - hosts: DC1, DC2
   gather_facts: no
   tasks:
-   - name: Upload EBGP config
+  - name: Upload EBGP config
     eos_config:
       src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_ebgp.cfg"
 
@@ -14,7 +14,7 @@
 - hosts: spines-DC1
   gather_facts: no
   tasks:
-   - name: Upload spines-DC1 interface configuration
+  - name: Upload spines-DC1 interface configuration
     eos_config:
       src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}_interfaces.cfg"
 
