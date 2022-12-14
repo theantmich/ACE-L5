@@ -1,0 +1,43 @@
+---
+
+leaf1-dc1:
+  interfaces:
+    Ethernet1:
+      ipv4: "192.168.1.1"
+      mask: "24"
+    Ethernet2:
+      ipv4: "192.168.2.1"
+      mask: "24"
+    Ethernet3:
+      ipv4: "192.168.3.1"
+      mask: "24"
+  BGP:
+    ASN: "65101"
+    neighbors:
+      neighbor1: 
+        ipv4: "192.168.11.1"
+        ASN:  "65102"
+      neighbor2: 
+        ipv4: "192.168.12.1"
+        ASN: "65102"
+
+leaf1-dc2:
+  interfaces:
+    Ethernet1:
+      ipv4: "192.168.11.1"
+      mask: "24"
+    Ethernet2:
+      ipv4: "192.168.12.1"
+      mask: "24"
+    Ethernet3:
+      ipv4: "192.168.13.1"
+      mask: "24"
+  BGP:
+    ASN: "65102"
+    neighbors:
+      neighbor1: 
+        ipv4: "192.168.1.1"
+        ASN:  "65102"
+      neighbor2: 
+        ipv4: "192.168.2.1"
+        ASN: "65102"

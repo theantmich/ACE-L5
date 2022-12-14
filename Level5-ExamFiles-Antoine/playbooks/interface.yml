@@ -1,0 +1,31 @@
+# This playbook is to be used to generate interface configuration (loopback0, loopback1, Ethernet) for the leafs and spines from underlay.yml
+
+---
+# For hosts: refer to the inventory file for an appropriate entry that would encompass DC2's leafs and spines
+- hosts: DC2
+  gather_facts: no
+  tasks:
+  - name: Register variables (candidates- Do not change this)
+    include_vars:
+      file: "{{lookup('env','PWD')}}/vars/underlay.yml"
+      name: underlay
+
+  - name: Create Config Subdirectories if it does not exist
+    ansible.builtin.file:
+      path: ./configs/{{inventory_hostname}}
+      state: directory
+
+  - name: Create template
+    template:
+      src: "{{lookup('env','PWD')}}/templates/interfaces.j2"
+      dest: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_interface.cfg"
+# Use the eos_config module to create a task to upload the configuration you created to the switch
+
+  - name: Upload Interface Underlay config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_interface.cfg"
+      
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start

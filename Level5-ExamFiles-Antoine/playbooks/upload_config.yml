@@ -1,0 +1,20 @@
+---
+- hosts: DC2
+  gather_facts: no
+  tasks:
+  - name: Upload Interfaces config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_interface.cfg"
+
+  - name: Upload Spine Underlay config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_spine.cfg"
+
+  - name: Upload Leaf Underlay config
+    eos_config:
+      src: "{{lookup('env','PWD')}}/configs/{{inventory_hostname}}/{{inventory_hostname}}_leaf.cfg"
+      
+  - name: Save Switch Configuration
+    eos_command:
+      commands:
+        - copy run start
