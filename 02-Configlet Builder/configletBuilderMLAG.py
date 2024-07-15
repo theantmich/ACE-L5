@@ -81,4 +81,3 @@ elif int(mlag_id) % 2 == 1:
     print("description MLAG PEER LINK -- LEAF  ")
     print("switchport mode trunk")
     print("channel-group 10 mode active  ")
-												
